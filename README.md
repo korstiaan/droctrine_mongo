@@ -10,7 +10,7 @@ Requirements
 * PHP 5.3.2+
 * Drimple (https://github.com/korstiaan/drimple)
 * Doctrine MongoDB ODM (https://github.com/doctrine/mongodb-odm)
-* 
+
 Doctrine MongoDB ODM availability, including its dependencies, can be achieved using Composer Loader (https://github.com/korstiaan/composer_loader) by adding the following line to your composer.json:
 
 ``` json
@@ -24,7 +24,7 @@ Doctrine MongoDB ODM availability, including its dependencies, can be achieved u
 Autoloading
 --------------------------------
 
-Suggested is using nsautoload (https://github.com/korstiaan/nsautoload) for autoloading your documents.
+Suggested is using nsautoload (https://github.com/korstiaan/nsautoload) for autoloading your documents and the service provider.
 
 Installation
 --------------------------------
