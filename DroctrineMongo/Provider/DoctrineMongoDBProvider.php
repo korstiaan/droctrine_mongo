@@ -266,7 +266,7 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
 				return new Connection(
 					isset($connection['server']) 	? $connection['server'] 	: null,
 					isset($connection['options']) 	? $connection['options']	: array(),
-					null,
+					$c["doctrine.odm.mongodb.dm.{$name}.configuration"],
 					$c["doctrine.odm.mongodb.connection.{$name}.event_manager"]					
 				);			 
 			});
