@@ -1,0 +1,37 @@
+<?php
+
+/**
+ * This file is part of Droctrine Mongo
+ *
+ * (c) Korstiaan de Ridder <korstiaan@korstiaan.com>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+
+
+use Droctrine\Mongo\Provider\DoctrineMongoDBProvider;
+use Drimple\Drimple;
+
+function mongo_init_drimple_provide(Drimple $drimple) 
+{
+    $drimple->register(new DoctrineMongoDBProvider(), array(
+        'doctrine.odm.mongodb.config.connection' => array(
+            'connections' => array(
+                'foo' => array(
+                ),                    
+            ),
+        ),
+        'doctrine.odm.mongodb.config.manager' => array(
+            'managers'    => array(
+                'foo'    => array(
+                	'auto_mapping' => true,
+                ),
+            ),
+            'config'    => array(
+                'database'	   => 'db_mongo',
+            ),
+        ),
+    ));
+
+}

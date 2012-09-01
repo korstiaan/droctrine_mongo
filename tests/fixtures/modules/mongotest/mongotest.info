@@ -1,0 +1,5 @@
+name 		= "Droctrine test 3"
+package 	= "Droctrine"
+name 		= "Droctrine test 3"
+core 		= "7.x"
+php 		= 5.3.3
