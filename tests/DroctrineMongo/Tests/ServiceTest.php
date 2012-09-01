@@ -189,24 +189,4 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             ),
         );
     }
-
-    protected function addDrupalMocks2(Drimple $drimple)
-    {
-        return;
-        $cache = $this->getMock('Droctrine\Mongo\\Cache\\DrupalCache');
-
-        $cache->expects($this->any())
-             ->method('get')
-             ->will($this->returnValue(false));
-
-        $drimple['doctrine.odm.mongodb.cache'] = $cache;
-
-        $helper = $this->getMock('Droctrine\Mongo\\Helper\\DrupalHelper');
-        $helper->expects($this->any())
-             ->method('getModuleList')
-             ->will($this->returnValue(array()));
-
-        $drimple['doctrine.odm.mongodb.helper'] = $helper;
-    }
-
 }
