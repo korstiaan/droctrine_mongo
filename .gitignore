@@ -1,3 +1,3 @@
-.settings/org.eclipse.php.core.prefs
-.project
-.buildpath
+composer.phar
+vendor/*
+modules/*

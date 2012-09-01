@@ -1,6 +1,0 @@
-name 		= "Droctrine Mongo"
-package 	= "Droctrine"
-description = "Doctrine ODM / MongoDB Service Provider for Drimple"
-core 		= "7.x"
-dependencies[] 	= drimple
-php 			= 5.3.2

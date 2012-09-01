@@ -1,0 +1,29 @@
+{
+    "name": "korstiaan/droctrine-mongo",
+    "description": "Adds Doctrine MongoDB ODM Services to Drimple for use in Drupal 7.x.",
+    "keywords": ["drupal", "doctrine", "mongodb"],
+    "homepage": "http://korstiaan.com/droctrine-mongo",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Korstiaan de Ridder",
+            "email": "korstiaan@korstiaan.com",
+            "homepage": "http://www.korstiaan.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "Droctrine\\Mongo": "src"
+        }
+    },   
+    "require": {
+        "php": ">=5.3.3",
+        "korstiaan/drimple": "*",
+        "doctrine/mongodb-odm": "dev-master"          
+    },
+    "require-dev": {
+        "korstiaan/drunit": "*",
+        "korstiaan/nsautoload": "*"
+    }
+}
