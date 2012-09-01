@@ -9,16 +9,6 @@ Adds Doctrine MongoDB ODM Services to Drimple for use in Drupal 7.x.
 * [Drimple](https://github.com/korstiaan/drimple)
 * [Doctrine MongoDB ODM](https://github.com/doctrine/mongodb-odm)
 
-Doctrine MongoDB ODM availability, including its dependencies, can be achieved adding the following lines to your `composer.json`:
-
-```json
-{
-    "require": {
-        "doctrine/mongodb-odm": "dev-master"
-    }
-}
-```
-
 ## Installation
 
 The recommended way to install `Droctrine Mongo` is with [Composer](http://getcomposer.org). 
@@ -26,7 +16,7 @@ Just add the following to your `composer.json`:
 
 ```json
    {
-          "minimum-stability": "dev",
+       "minimum-stability": "dev",
        "require": {
               ...
            "korstiaan/droctrine-mongo": "dev-master"
