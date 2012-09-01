@@ -25,5 +25,8 @@
     "require-dev": {
         "korstiaan/drunit": "*",
         "korstiaan/nsautoload": "*"
+    },
+    "suggest": {
+        "korstiaan/nsautoload": "Autoloads your module's documents"
     }
 }
