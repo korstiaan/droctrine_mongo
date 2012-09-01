@@ -100,6 +100,6 @@ class DrupalCache extends CacheProvider
      */
     protected function getTimeStamp()
     {
-        return isset($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        return time();
     }
 }

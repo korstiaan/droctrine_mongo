@@ -29,4 +29,14 @@ class CacheTest extends BaseTest
 
         $this->assertNull($stats);
     }
+    
+    public function testLifetime()
+    {
+        $cache = $this->_getCacheDriver();
+        $cache->save('lifetimed_key',  'foo', 1);
+        $cache->save('lifetimed_key2', 'foo', 30);
+        sleep(3);
+        $this->assertFalse($cache->contains('lifetimed_key'));
+        $this->assertTrue($cache->contains('lifetimed_key2'));
+    }
 }
