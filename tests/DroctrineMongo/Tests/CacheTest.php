@@ -21,7 +21,7 @@ class CacheTest extends BaseTest
     {
         return new DrupalCache();
     }
-    
+
     public function testGetStats()
     {
         $cache = $this->_getCacheDriver();
@@ -29,7 +29,7 @@ class CacheTest extends BaseTest
 
         $this->assertNull($stats);
     }
-    
+
     public function testLifetime()
     {
         $cache = $this->_getCacheDriver();

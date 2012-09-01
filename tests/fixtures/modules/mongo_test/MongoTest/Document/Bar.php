@@ -9,7 +9,6 @@
  * with this source code in the file LICENSE.
  */
 
-
 namespace MongoTest\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
