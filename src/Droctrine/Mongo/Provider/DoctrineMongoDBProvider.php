@@ -68,9 +68,11 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
      *
      * E.g. foo_bar/FooBar/Document/User.php should have a namespace of FooBar\Document
      *
-     * Drupal's cache api is used to cache the found document dirs + namespaces.
+     * Caching is used (either Drupal cache api or a Doctrine cache driver) for the found document dirs + namespaces.
      *
      * @param MappingDriverChain $chain
+     * @param Cache              $cache
+     * @param DrupalHelper       $helper
      */
     public static function addAutoMapping(MappingDriverChain $chain, Cache $cache, DrupalHelper $helper)
     {
