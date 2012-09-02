@@ -1,6 +1,8 @@
 # Droctrine Mongo for Drupal 7.x
 
 Adds Doctrine MongoDB ODM Services to Drimple for use in Drupal 7.x. 
+
+[![Build Status](https://secure.travis-ci.org/korstiaan/droctrine_mongo.png?branch=master)](http://travis-ci.org/korstiaan/droctrine_mongo)
  
 ## Requirements
 
