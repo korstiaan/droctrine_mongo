@@ -167,23 +167,18 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
                 ),
             ),
             'doctrine.odm.mongodb.config.manager' => array(
-                'managers'    => array(
-                    'bar'    => array(
+                'managers' => array(
+                    'bar'  => array(
                         'connection' => 'foo',
-                        'auto_mapping' => false,
-
                     ),
-                    'foo'    => array(
+                    'foo'  => array(
                         'connection' => 'bar',
-                        'auto_mapping' => false,
-
                     ),
-                    'crux'    => array(
-                        'auto_mapping' => false,
-
+                    'crux' => array(
                     ),
                 ),
-                'config'    => array(
+                'config' => array(
+                    'auto_mapping' => false,
                     'database'	   => 'db_mongo',
                 ),
             ),
