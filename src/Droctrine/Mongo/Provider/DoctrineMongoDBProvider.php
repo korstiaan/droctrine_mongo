@@ -51,12 +51,12 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
         /**
          * Add connection services definition from $drimple[doctrine.odm.mongodb.config.connection]
          */
-        $this->loadConnections($drimple,         $drimple['doctrine.odm.mongodb.config.connection']);
+        $this->loadConnections($drimple,      $drimple['doctrine.odm.mongodb.config.connection']);
 
         /**
          * Add document manager services definition from $drimple[doctrine.odm.mongodb.config.manager]
          */
-        $this->loadDocumentManagers($drimple,     $drimple['doctrine.odm.mongodb.config.manager']);
+        $this->loadDocumentManagers($drimple, $drimple['doctrine.odm.mongodb.config.manager']);
 
     }
 
