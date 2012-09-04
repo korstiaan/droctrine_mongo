@@ -5,9 +5,13 @@ php:
   - 5.3
 
 env:
-  - MONGO_VERSION=1.2.12 MEMCACHE_VERSION=3.0.6 
+  - MONGO_VERSION=1.2.12 MEMCACHE_VERSION=3.0.6 APC_VERSION=3.1.13
   
 before_script:
+  - wget http://pecl.php.net/get/APC-${APC_VERSION}.tgz
+  - tar -xzf APC-${APC_VERSION}.tgz
+  - sh -c "cd APC-${APC_VERSION} && phpize && ./configure && make && sudo make install"
+  - echo "extension=apc.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
   - wget http://pecl.php.net/get/memcache-${MEMCACHE_VERSION}.tgz
   - tar -xzf memcache-${MEMCACHE_VERSION}.tgz
   - sh -c "cd memcache-${MEMCACHE_VERSION} && phpize && ./configure && make && sudo make install"
