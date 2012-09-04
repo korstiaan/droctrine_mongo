@@ -11,6 +11,16 @@
 
 namespace Droctrine\Mongo\Provider;
 
+use Doctrine\Common\Cache\RedisCache,
+    Doctrine\Common\Cache\XcacheCache,
+    Doctrine\Common\Cache\WinCacheCache,
+    Doctrine\Common\Cache\ApcCache,
+    Doctrine\Common\Cache\FilesystemCache,
+    Doctrine\Common\Cache\MemcachedCache,
+    Doctrine\Common\Cache\MemcacheCache,
+    Doctrine\Common\Cache\ArrayCache
+;
+
 use Droctrine\Mongo\Helper\DrupalHelper,
     Droctrine\Mongo\Cache\DrupalCache
 ;
@@ -39,10 +49,6 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
      */
     public function register(Drimple $drimple)
     {
-
-        $drimple['doctrine.odm.mongodb.cache']  = $drimple->share(function($c) {
-            return new DrupalCache();
-        });
 
         $drimple['doctrine.odm.mongodb.helper'] = $drimple->share(function($c) {
             return new DrupalHelper();
@@ -115,13 +121,17 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
      * - %doctrine.odm.mongodb.dm.<name>.event_manager%
      * - %doctrine.odm.mongodb.dm.<name>.configuration%
      * - %doctrine.odm.mongodb.dm.<name>.connection%
+     * - %doctrine.odm.mongodb.dm.<name>.cache.meta%
+     * - %doctrine.odm.mongodb.dm.<name>.cache.mapping%
      *
      * Also these are set to defaults (without <name>) based on $config[default] or the first found $config[managers] which result in:
      * - %doctrine.odm.mongodb.dm%
      * - %doctrine.odm.mongodb.dm.event_manager%
      * - %doctrine.odm.mongodb.dm.configuration%
      * - %doctrine.odm.mongodb.dm.connection%
-     *
+     * - %doctrine.odm.mongodb.dm.cache.meta% 
+     * - %doctrine.odm.mongodb.dm.cache.mapping%
+     * 
      * @param Drimple $drimple
      * @param array   $config  document mangers configration
      *
@@ -149,6 +159,47 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
             }
 
             $manager['config'] = $manager['config'] + $default;
+            foreach (array('meta', 'mapping') as $cache) {
+                $drimple["doctrine.odm.mongodb.dm.{$name}.cache.{$cache}"] = $drimple->share(function($c) use ($manager, $cache) {
+                    $config = (isset($manager['config']['cache'][$cache]) ? $manager['config']['cache'][$cache] : array()) 
+                        + array(
+                    		'type' => 'array',                
+                        );
+                    
+                    switch ($config['type']) {
+                        case 'array':
+                            return new ArrayCache();
+                        case 'memcache':
+                            $cache = new MemcacheCache();
+                            $cache->setMemcache($c[$config['service']]);
+                            return $cache;
+                        case 'memcached':
+                            $cache = new MemcachedCache();
+                            $cache->setMemcached($c[$config['service']]);
+                            return $cache;
+                        case 'apc':
+                            return new ApcCache();
+                        case 'wincache':
+                            return new WinCacheCache();
+                        case 'xcache':
+                            return new XcacheCache();
+                        case 'redis':
+                            $cache = new RedisCache();
+                            $cache->setRedis($c[$config['service']]);
+                            return $cache;            
+                        case 'filesystem':
+                            if (!isset($config['directory'])) {
+                                throw new \RuntimeException('Filesytem cache driver needs directory setting');
+                            }
+                            $cache = new FilesystemCache($config['directory']);
+                            return $cache;            
+                        default:
+                            throw new \RuntimeException(sprintf('Invalid cache driver %s', $config['type']));
+                            
+                    }
+                });    
+            }
+            
 
             $drimple["doctrine.odm.mongodb.dm.{$name}.configuration"] = $drimple->share(function($c) use ($manager, $self, $name) {
 
@@ -183,14 +234,12 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
 
                 $config->setDefaultDB($manager['config']['database']);
 
-                if (isset($manager['config']['meta_cache_class'])) {
-                    $config->setMetadataCacheImpl(new $manager['config']['meta_cache_class']);
-                }
+                $config->setMetadataCacheImpl($c["doctrine.odm.mongodb.dm.{$name}.cache.meta"]);
 
                 $chain = new MappingDriverChain();
 
                 if (!isset($manager['auto_mapping']) || true === $manager['auto_mapping']) {
-                    $self::addAutoMapping($chain, $c['doctrine.odm.mongodb.cache'], $c['doctrine.odm.mongodb.helper']);
+                    $self::addAutoMapping($chain, $c["doctrine.odm.mongodb.dm.{$name}.cache.mapping"], $c['doctrine.odm.mongodb.helper']);
                 }
 
                 if (isset($manager['drivers'])) {
@@ -239,6 +288,8 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
             '.event_manager',
             '.configuration',
             '.connection',
+            '.cache.meta',
+            '.cache.mapping',
         ) as $type) {
             $drimple["doctrine.odm.mongodb.dm{$type}"] = $drimple->share(function($c) use ($default, $type) {
                 return $c["doctrine.odm.mongodb.dm.{$default}{$type}"];

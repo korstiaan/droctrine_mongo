@@ -28,6 +28,9 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             $this->assertInstanceOf('Doctrine\\Common\\EventManager',          $drimple["doctrine.odm.mongodb.dm.{$name}.event_manager"]);
             $this->assertInstanceOf('Doctrine\\ODM\\MongoDB\\Configuration',   $drimple["doctrine.odm.mongodb.dm.{$name}.configuration"]);
             $this->assertInstanceOf('Doctrine\\MongoDB\\Connection',           $drimple["doctrine.odm.mongodb.dm.{$name}.connection"]);
+            $this->assertInstanceOf('Doctrine\\Common\\Cache\\Cache',          $drimple["doctrine.odm.mongodb.dm.{$name}.cache.meta"]);
+            $this->assertInstanceOf('Doctrine\\Common\\Cache\\Cache',          $drimple["doctrine.odm.mongodb.dm.{$name}.cache.mapping"]);
+            
 
             $this->assertInstanceOf('Doctrine\\MongoDB\\Connection',           $drimple["doctrine.odm.mongodb.connection.{$name}"]);
             $this->assertInstanceOf('Doctrine\\Common\\EventManager',          $drimple["doctrine.odm.mongodb.connection.{$name}.event_manager"]);
@@ -42,7 +45,7 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertNotSame($drimple['doctrine.odm.mongodb.connection.foo.event_manager'], $drimple['doctrine.odm.mongodb.connection.bar.event_manager']);
         $this->assertNotSame($drimple['doctrine.odm.mongodb.connection.foo.configuration'], $drimple['doctrine.odm.mongodb.connection.bar.configuration']);
     }
-
+ 
     public function testDefaultDefaults()
     {
         $drimple = new Drimple();
@@ -52,6 +55,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($drimple['doctrine.odm.mongodb.dm.bar.event_manager'], $drimple['doctrine.odm.mongodb.dm.event_manager']);
         $this->assertSame($drimple['doctrine.odm.mongodb.dm.bar.configuration'], $drimple['doctrine.odm.mongodb.dm.configuration']);
         $this->assertSame($drimple['doctrine.odm.mongodb.dm.bar.connection'],    $drimple['doctrine.odm.mongodb.dm.connection']);
+        $this->assertSame($drimple['doctrine.odm.mongodb.dm.bar.cache.meta'],    $drimple['doctrine.odm.mongodb.dm.cache.meta']);
+        $this->assertSame($drimple['doctrine.odm.mongodb.dm.bar.cache.mapping'], $drimple['doctrine.odm.mongodb.dm.cache.mapping']);
 
         $this->assertSame($drimple['doctrine.odm.mongodb.connection.foo'],               $drimple['doctrine.odm.mongodb.connection']);
         $this->assertSame($drimple['doctrine.odm.mongodb.connection.foo.event_manager'], $drimple['doctrine.odm.mongodb.connection.event_manager']);
@@ -70,6 +75,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($drimple["doctrine.odm.mongodb.dm.{$dmDefault}.event_manager"], $drimple['doctrine.odm.mongodb.dm.event_manager']);
         $this->assertSame($drimple["doctrine.odm.mongodb.dm.{$dmDefault}.configuration"], $drimple['doctrine.odm.mongodb.dm.configuration']);
         $this->assertSame($drimple["doctrine.odm.mongodb.dm.{$dmDefault}.connection"],    $drimple['doctrine.odm.mongodb.dm.connection']);
+        $this->assertSame($drimple["doctrine.odm.mongodb.dm.{$dmDefault}.cache.meta"],    $drimple['doctrine.odm.mongodb.dm.cache.meta']);
+        $this->assertSame($drimple["doctrine.odm.mongodb.dm.{$dmDefault}.cache.mapping"], $drimple['doctrine.odm.mongodb.dm.cache.mapping']);
 
         $this->assertSame($drimple["doctrine.odm.mongodb.connection.{$conDefault}"],               $drimple['doctrine.odm.mongodb.connection']);
         $this->assertSame($drimple["doctrine.odm.mongodb.connection.{$conDefault}.event_manager"], $drimple['doctrine.odm.mongodb.connection.event_manager']);
@@ -97,13 +104,106 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
 
         return $ret;
     }
+   
+    public function testMetaIsCached()
+    {
+        $drimple = new Drimple();
 
+        $drimple->register(new DoctrineMongoDBProvider(), $this->getMinimumConfig());
+        $this->assertNotNull($drimple['doctrine.odm.mongodb.dm.configuration']->getMetadataCacheImpl());
+        $this->assertInstanceOf('Doctrine\\Common\\Cache\\Cache', $drimple['doctrine.odm.mongodb.dm.configuration']->getMetadataCacheImpl());   
+    }
+    
+
+    /**
+     * @dataProvider getCachingDriverConfigs
+     */
+    public function testCacheDrivers($extension, $type, $class, array $extraConfig = array(), array $services = array(), array $instances = array())
+    {
+        if (null !== $extension && !extension_loaded($extension)) {
+            $this->markTestSkipped();
+        }
+        
+        $drimple = new Drimple();
+        
+        foreach ($services as $service => $value) {
+            $drimple[$service] = $value;
+        }
+        
+        $config  = $this->getMinimumConfig();
+        $config['doctrine.odm.mongodb.config.manager']['config']['cache'] = array(
+        	'meta' => array(
+        		'type' => $type,
+            ) + $extraConfig,
+        );
+        $drimple->register(new DoctrineMongoDBProvider(), $config);
+        $this->assertInstanceOf($class, $drimple['doctrine.odm.mongodb.dm.bar.cache.meta']);
+        foreach ($instances as $f => $c) {
+            $this->assertInstanceOf($c, $drimple['doctrine.odm.mongodb.dm.bar.cache.meta']->$f());
+        }
+    }
+    
+    public function getCachingDriverConfigs()
+    {
+        return array(
+            array(
+                null,
+                'array',
+                'Doctrine\\Common\\Cache\\ArrayCache',
+            ),
+            array(
+                'wincache',
+                'wincache',
+                'Doctrine\\Common\\Cache\\WinCacheCache',
+            ),
+            array(
+                'xcache',
+                'xcache',
+                'Doctrine\\Common\\Cache\\XCacheCache',
+            ),
+            array(
+                'apc',
+                'apc',
+                'Doctrine\\Common\\Cache\\ApcCache',
+            ),
+            array(
+                null,
+                'filesystem',
+                'Doctrine\\Common\\Cache\\FilesystemCache',
+                array('directory' => sys_get_temp_dir()),
+            ),
+            array(
+                'memcache',
+                'memcache',
+                'Doctrine\\Common\\Cache\\MemcacheCache',
+                array('service'     => 'memcache'),
+                array('memcache'    => $this->getMock('Memcache')),
+                array('getMemCache' => 'Memcache')
+            ),
+            array(
+                'memcached',
+                'memcached',
+                'Doctrine\\Common\\Cache\\MemcachedCache',
+                array('service'   => 'memcached'),
+                array('memcached' => $this->getMock('Memcached')),
+                array('getMemCached' => 'Memcached')
+            ),
+            array(
+                'redis',
+                'redis',
+                'Doctrine\\Common\\Cache\\RedisCache',
+                array('service' => 'redis'),
+                array('redis'   => $this->getMock('Redis')),
+            ),
+        );
+    }
+    
     /**
      * @dataProvider getCachingConfigs
      */
     public function testMappingIsCached($config)
     {
-        $cache = $this->getMock('Droctrine\Mongo\\Cache\\DrupalCache');
+        $cache = $this->getMock('Doctrine\\Common\\Cache\\ArrayCache');
 
         $cache->expects($this->at(0))
              ->method('fetch')
@@ -120,7 +220,8 @@ class ServiceTest extends \PHPUnit_Framework_TestCase
             $drimple = new Drimple();
 
             $drimple->register(new DoctrineMongoDBProvider(), $config);
-            $drimple['doctrine.odm.mongodb.cache'] = $cache;
+
+            $drimple['doctrine.odm.mongodb.dm.bar.cache.mapping'] = $cache;
 
             $helper = $this->getMock('Droctrine\Mongo\\Helper\\DrupalHelper');
             $helper->expects($this->any())
