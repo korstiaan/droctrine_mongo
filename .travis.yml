@@ -5,8 +5,7 @@ php:
   - 5.3
 
 env:
-  - MONGO_VERSION=1.2.12
-  - MEMCACHE_VERSION=3.0.6
+  - MONGO_VERSION=1.2.12 MEMCACHE_VERSION=3.0.6 
   
 before_script:
   - wget http://pecl.php.net/get/memcache-${MEMCACHE_VERSION}.tgz
