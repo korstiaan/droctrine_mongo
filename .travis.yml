@@ -6,9 +6,12 @@ php:
 
 env:
   - MONGO_VERSION=1.2.12
+  - MEMCACHE_VERSION=3.0.6
   
 before_script:
-  - pecl install memcache
+  - wget http://pecl.php.net/get/memcache-${MEMCACHE_VERSION}.tgz
+  - tar -xzf memcache-${MEMCACHE_VERSION}.tgz
+  - sh -c "cd memcache-${MEMCACHE_VERSION} && phpize && ./configure && make && sudo make install"
   - echo "extension=memcache.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
   - wget http://pecl.php.net/get/mongo-${MONGO_VERSION}.tgz
   - tar -xzf mongo-${MONGO_VERSION}.tgz
