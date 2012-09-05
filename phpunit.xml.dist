@@ -15,8 +15,5 @@
         <testsuite name="Droctrine Mongo Test Suite">
             <directory>./tests/DroctrineMongo/</directory>
         </testsuite>
-        <testsuite name="Droctrine Mongo Test Suite2">
-            <directory>./tests/</directory>
-        </testsuite>
     </testsuites>
 </phpunit>
