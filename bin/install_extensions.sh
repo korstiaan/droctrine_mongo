@@ -24,5 +24,5 @@ if [ "${MONGO_VERSION:+1}" = 1 ]; then
     wget http://pecl.php.net/get/mongo-${MONGO_VERSION}.tgz
     tar -xzf mongo-${MONGO_VERSION}.tgz
     sh -c "cd mongo-${MONGO_VERSION} && phpize && ./configure && make && sudo make install"
-    echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"
+    echo "extension=mongo.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
 fi
