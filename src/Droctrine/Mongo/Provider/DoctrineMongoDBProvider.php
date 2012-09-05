@@ -129,9 +129,9 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
      * - %doctrine.odm.mongodb.dm.event_manager%
      * - %doctrine.odm.mongodb.dm.configuration%
      * - %doctrine.odm.mongodb.dm.connection%
-     * - %doctrine.odm.mongodb.dm.cache.meta% 
+     * - %doctrine.odm.mongodb.dm.cache.meta%
      * - %doctrine.odm.mongodb.dm.cache.mapping%
-     * 
+     *
      * @param Drimple $drimple
      * @param array   $config  document mangers configration
      *
@@ -161,21 +161,23 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
             $manager['config'] = $manager['config'] + $default;
             foreach (array('meta', 'mapping') as $cache) {
                 $drimple["doctrine.odm.mongodb.dm.{$name}.cache.{$cache}"] = $drimple->share(function($c) use ($manager, $cache) {
-                    $config = (isset($manager['config']['cache'][$cache]) ? $manager['config']['cache'][$cache] : array()) 
+                    $config = (isset($manager['config']['cache'][$cache]) ? $manager['config']['cache'][$cache] : array())
                         + array(
-                    		'type' => 'array',                
+                            'type' => 'array',
                         );
-                    
+
                     switch ($config['type']) {
                         case 'array':
                             return new ArrayCache();
                         case 'memcache':
                             $cache = new MemcacheCache();
                             $cache->setMemcache($c[$config['service']]);
+
                             return $cache;
                         case 'memcached':
                             $cache = new MemcachedCache();
                             $cache->setMemcached($c[$config['service']]);
+
                             return $cache;
                         case 'apc':
                             return new ApcCache();
@@ -186,20 +188,21 @@ class DoctrineMongoDBProvider implements ServiceProviderInterface
                         case 'redis':
                             $cache = new RedisCache();
                             $cache->setRedis($c[$config['service']]);
-                            return $cache;            
+
+                            return $cache;
                         case 'filesystem':
                             if (!isset($config['directory'])) {
                                 throw new \RuntimeException('Filesytem cache driver needs directory setting');
                             }
                             $cache = new FilesystemCache($config['directory']);
-                            return $cache;            
+
+                            return $cache;
                         default:
                             throw new \RuntimeException(sprintf('Invalid cache driver %s', $config['type']));
-                            
+
                     }
-                });    
+                });
             }
-            
 
             $drimple["doctrine.odm.mongodb.dm.{$name}.configuration"] = $drimple->share(function($c) use ($manager, $self, $name) {
 
